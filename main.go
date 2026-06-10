@@ -195,7 +195,7 @@ func scrapeFeeds(s *state) error {
 		pubDate, err := time.Parse(time.RFC1123Z, item.PubDate)
 		if err != nil {
 			log.Printf("error parsing date: %v", err)
-			continue // skip item ini, lanjut ke item berikutnya
+			continue 
 		}
 		_, err = s.db.CreatePost(context.Background(), database.CreatePostParams{
 			ID:          uuid.New(),
