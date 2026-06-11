@@ -1,4 +1,4 @@
-package main
+package app
 
 import (
 	"context"
@@ -24,11 +24,12 @@ type RSSItem struct {
 	PubDate     string `xml:"pubDate"`
 }
 
-func fetchFeed(ctx context.Context, feedUrl string) (*RSSFeed, error) {
-	req, err := http.NewRequestWithContext(ctx, "GET", feedUrl, nil)
+func fetchFeed(ctx context.Context, feedURL string) (*RSSFeed, error) {
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, feedURL, nil)
 	if err != nil {
 		return nil, err
 	}
+
 	req.Header.Set("User-Agent", "gator")
 	client := http.Client{}
 	res, err := client.Do(req)
@@ -36,6 +37,7 @@ func fetchFeed(ctx context.Context, feedUrl string) (*RSSFeed, error) {
 		return nil, err
 	}
 	defer res.Body.Close()
+
 	data, err := io.ReadAll(res.Body)
 	if err != nil {
 		return nil, err
@@ -46,11 +48,13 @@ func fetchFeed(ctx context.Context, feedUrl string) (*RSSFeed, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	feed.Channel.Title = html.UnescapeString(feed.Channel.Title)
 	feed.Channel.Description = html.UnescapeString(feed.Channel.Description)
 	for i, item := range feed.Channel.Item {
 		feed.Channel.Item[i].Title = html.UnescapeString(item.Title)
 		feed.Channel.Item[i].Description = html.UnescapeString(item.Description)
 	}
+
 	return &feed, nil
 }
